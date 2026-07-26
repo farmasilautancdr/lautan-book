@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>LAUTAN Book</title>
+<meta name="theme-color" content="#123A5F">
+<meta name="description" content="Rujukan Poison C dan cadangan combo untuk operasi farmasi">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LAUTAN Book">
+<style>
+  :root{
+    --navy:#1B5489;
+    --navy-dark:#0F3E63;
+    --navy-deep:#0A2C48;
+    --navy-light:#3D7DAD;
+    --cream:#F5F3EC;
+    --paper:#FFFFFF;
+    --gold:#D9A441;
+    --gold-dark:#A9761F;
+    --gold-tint:#FBF1DC;
+    --teal:#3E8E7E;
+    --teal-tint:#E7F2EF;
+    --ink:#1B2430;
+    --ink-soft:#606B79;
+    --ink-faint:#8B93A0;
+    --line:#E5E1D6;
+    --danger:#C1503F;
+    --radius:14px;
+    --radius-sm:9px;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;background:var(--cream);}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
+    overscroll-behavior-y:contain;
+    -webkit-font-smoothing:antialiased;
+  }
+  .serif{ font-family:Georgia,"Iowan Old Style","Times New Roman",serif; }
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    background:linear-gradient(155deg, var(--navy-dark) 0%, var(--navy-deep) 100%);
+    color:#fff;
+    padding:calc(12px + var(--safe-top)) 16px 16px;
+  }
+  .topbar-row{display:flex;align-items:center;gap:10px;}
+  .topbar .back{
+    width:32px;height:32px;border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    border:none;color:#fff;font-size:17px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;cursor:pointer;
+  }
+  .topbar .back:active{background:rgba(255,255,255,0.24);}
+  .topbar .titles{flex:1;min-width:0;}
+  .topbar h1{font-size:18px;margin:0;font-weight:700;letter-spacing:0.2px;}
+  .topbar .sub{font-size:11px;opacity:0.72;margin-top:2px;letter-spacing:0.15px;}
+  .topbar .wordmark{display:flex;align-items:center;gap:9px;}
+  .topbar .wordmark img{width:26px;height:26px;border-radius:6px;background:#fff;padding:2px;flex-shrink:0;}
+
+  .top-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .lang-toggle{display:flex;background:rgba(255,255,255,0.1);border-radius:20px;padding:2px;}
+  .lang-toggle button{
+    border:none;background:none;color:rgba(255,255,255,0.68);font-size:11px;font-weight:700;
+    padding:5px 9px;border-radius:16px;cursor:pointer;letter-spacing:0.3px;
+  }
+  .lang-toggle button.active{background:var(--gold);color:var(--navy-deep);}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:#6fcf97;flex-shrink:0;box-shadow:0 0 0 3px rgba(111,207,151,0.18);}
+  .status-dot.offline{background:var(--danger);box-shadow:0 0 0 3px rgba(193,80,63,0.18);}
+  .settings-btn{
+    background:none;border:none;color:rgba(255,255,255,0.78);font-size:16px;cursor:pointer;
+    width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .settings-btn:active{background:rgba(255,255,255,0.14);}
+
+  .wave-divider{display:block;width:100%;height:14px;margin-top:-1px;}
+  .wave-divider path{fill:var(--cream);}
+
+  main{flex:1;padding:2px 16px calc(24px + var(--safe-bottom));max-width:640px;width:100%;margin:0 auto;}
+
+  .hero{padding:22px 4px 4px;text-align:center;}
+  .hero .mark{width:54px;height:54px;border-radius:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(15,62,99,0.18);}
+  .hero h2{margin:0;font-size:23px;color:var(--navy-deep);font-weight:700;letter-spacing:0.2px;}
+  .hero p{margin:7px 0 0;color:var(--ink-soft);font-size:13.5px;}
+
+  .portal-list{display:flex;flex-direction:column;gap:12px;margin-top:20px;}
+  .portal-card{
+    background:var(--paper);border-radius:var(--radius);padding:0;
+    border:1px solid var(--line);display:flex;align-items:stretch;
+    cursor:pointer;text-align:left;overflow:hidden;transition:transform .12s ease;
+  }
+  .portal-card:active{transform:scale(0.985);}
+  .portal-card .stripe{width:5px;flex-shrink:0;}
+  .portal-card.pc .stripe{background:var(--navy);}
+  .portal-card.combo .stripe{background:var(--gold);}
+  .portal-card .content{display:flex;align-items:center;gap:14px;padding:18px 16px;flex:1;min-width:0;}
+  .portal-card .icon{
+    width:46px;height:46px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:21px;flex-shrink:0;font-weight:700;
+  }
+  .portal-card.pc .icon{background:var(--teal-tint);color:var(--navy);}
+  .portal-card.combo .icon{background:var(--gold-tint);color:var(--gold-dark);}
+  .portal-card h3{margin:0 0 3px;font-size:16px;color:var(--ink);font-weight:700;}
+  .portal-card p{margin:0;font-size:12px;color:var(--ink-soft);line-height:1.4;}
+  .portal-card .chev{margin-left:auto;color:var(--ink-faint);font-size:18px;flex-shrink:0;padding-right:16px;}
+
+  .footer-note{height:8px;}
+
+  .search-wrap{position:sticky;top:0;z-index:15;background:var(--cream);padding:14px 0 8px;}
+  .search-box{
+    display:flex;align-items:center;gap:8px;
+    background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;
+  }
+  .search-box:focus-within{border-color:var(--navy-light);}
+  .search-box input{border:none;outline:none;flex:1;font-size:15px;background:transparent;color:var(--ink);font-family:inherit;}
+  .search-box .icon-lens{color:var(--ink-faint);font-size:14px;}
+  .search-box .clear-btn{
+    border:none;background:var(--line);color:var(--ink-soft);
+    width:19px;height:19px;border-radius:50%;font-size:11px;cursor:pointer;
+    display:none;align-items:center;justify-content:center;
+  }
+  .search-box .clear-btn.show{display:flex;}
+
+  .filter-row{display:flex;gap:7px;margin-top:10px;overflow-x:auto;padding-bottom:2px;}
+  .filter-chip{
+    flex-shrink:0;padding:6px 13px;border-radius:18px;
+    background:var(--paper);border:1px solid var(--line);
+    font-size:12px;color:var(--ink-soft);cursor:pointer;white-space:nowrap;font-weight:600;
+  }
+  .filter-chip.active{background:var(--navy-dark);color:#fff;border-color:var(--navy-dark);}
+
+  .suggest-list{margin-top:4px;}
+  .suggest-list .label{
+    font-size:11px;color:var(--ink-faint);margin:12px 2px 8px;
+    text-transform:uppercase;letter-spacing:0.6px;font-weight:700;
+  }
+  .chip-cloud{display:flex;flex-wrap:wrap;gap:8px;}
+  .sym-chip{
+    padding:7px 13px;border-radius:18px;font-size:12.5px;
+    background:var(--gold-tint);color:var(--gold-dark);border:1px solid #eddcb3;
+    cursor:pointer;font-weight:600;
+  }
+  .sym-chip:active{background:#f5e6c2;}
+
+  .result-count{font-size:12px;color:var(--ink-faint);margin:14px 2px 9px;font-weight:600;letter-spacing:0.2px;}
+  .card-list{display:flex;flex-direction:column;gap:9px;}
+  .med-card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-sm);
+    padding:13px 15px;border-left:3px solid var(--navy);
+  }
+  .med-card.tone-gold{border-left-color:var(--gold);}
+  .med-card.tone-teal{border-left-color:var(--teal);}
+  .med-card .row1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .med-card .brand{font-size:15.5px;font-weight:700;color:var(--navy-deep);text-transform:capitalize;}
+  .med-card .active-tag{
+    font-size:10px;font-weight:700;color:var(--navy);background:var(--teal-tint);
+    padding:3px 9px;border-radius:7px;white-space:nowrap;text-transform:capitalize;
+  }
+  .med-card .indikasi{font-size:12.5px;color:var(--ink-soft);margin-top:6px;line-height:1.45;}
+  .med-card .dos{
+    margin-top:8px;font-size:12px;color:var(--navy-deep);font-weight:700;
+    padding-top:8px;border-top:1px dashed var(--line);
+  }
+
+  .combo-section{margin-top:4px;}
+  .combo-section h4{
+    font-size:11.5px;text-transform:uppercase;letter-spacing:0.6px;
+    color:var(--ink-soft);margin:18px 2px 8px;display:flex;align-items:center;gap:8px;font-weight:700;
+  }
+  .combo-section h4 .badge{
+    background:var(--navy-dark);color:#fff;font-size:9.5px;padding:2px 8px;border-radius:9px;
+    text-transform:none;letter-spacing:0;font-weight:700;
+  }
+  .combo-section.suplemen h4 .badge{background:var(--gold-dark);}
+  .combo-section.nasal h4 .badge{background:var(--teal);}
+  .combo-hint{
+    font-size:11.5px;color:var(--ink-soft);background:var(--teal-tint);border-radius:var(--radius-sm);
+    padding:9px 12px;margin-top:2px;line-height:1.4;
+  }
+
+  .empty-state{text-align:center;padding:46px 20px;color:var(--ink-soft);}
+  .empty-state .mark{width:34px;height:2px;background:var(--gold);margin:0 auto 16px;border-radius:2px;}
+  .empty-state p{font-size:13px;margin:4px 0;}
+  .empty-state b{color:var(--ink);}
+
+  .loading{display:flex;flex-direction:column;align-items:center;padding:60px 20px;color:var(--ink-soft);}
+  .spinner{
+    width:26px;height:26px;border-radius:50%;
+    border:3px solid var(--line);border-top-color:var(--navy);
+    animation:spin 0.8s linear infinite;margin-bottom:12px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .toast{
+    position:fixed;left:16px;right:16px;bottom:calc(20px + var(--safe-bottom));
+    background:var(--navy-deep);color:#fff;padding:12px 16px;border-radius:11px;
+    font-size:13px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    z-index:50;opacity:0;transform:translateY(10px);pointer-events:none;
+    transition:opacity .25s, transform .25s;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(10,44,72,0.45);z-index:60;
+    display:none;align-items:flex-end;justify-content:center;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal{
+    background:var(--paper);width:100%;max-width:520px;border-radius:18px 18px 0 0;
+    padding:20px 20px calc(24px + var(--safe-bottom));
+  }
+  .modal h3{margin:0 0 4px;font-size:16px;color:var(--navy-deep);}
+  .modal p{font-size:12.5px;color:var(--ink-soft);margin:0 0 14px;line-height:1.5;}
+  .modal input{
+    width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:9px;
+    font-size:13px;outline:none;font-family:monospace;
+  }
+  .modal input:focus{border-color:var(--navy-light);}
+  .modal .modal-actions{display:flex;gap:10px;margin-top:14px;}
+  .modal button.primary{
+    flex:1;background:var(--navy-dark);color:#fff;border:none;border-radius:9px;
+    padding:12px;font-size:14px;font-weight:600;cursor:pointer;
+  }
+  .modal button.secondary{
+    background:none;border:1.5px solid var(--line);color:var(--ink-soft);border-radius:9px;
+    padding:12px 16px;font-size:14px;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar" id="topbar">
+    <div class="topbar-row">
+      <button class="back" id="backBtn" style="display:none;" aria-label="Back">←</button>
+      <div class="wordmark" id="homeWordmark">
+        <img src="icons/icon-192.png" alt="LAUTAN Book">
+      </div>
+      <div class="titles">
+        <h1 class="serif" id="pageTitle">LAUTAN Book</h1>
+        <div class="sub" id="pageSub">Pharmacy Reference</div>
+      </div>
+      <div class="top-actions">
+        <div class="lang-toggle" id="langToggle">
+          <button data-lang="ms" id="langMs">BM</button>
+          <button data-lang="en" id="langEn">EN</button>
+        </div>
+        <span class="status-dot" id="statusDot" title="Online"></span>
+        <button class="settings-btn" id="settingsBtn" aria-label="Settings">⚙</button>
+      </div>
+    </div>
+    <svg class="wave-divider" viewBox="0 0 400 20" preserveAspectRatio="none">
+      <path d="M0,8 C40,18 80,-2 120,8 C160,18 200,-2 240,8 C280,18 320,-2 360,8 C380,12 390,4 400,8 L400,20 L0,20 Z"/>
+    </svg>
+  </div>
+
+  <main id="main"></main>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <h3 id="settingsTitle">Tetapan Sambungan</h3>
+      <p id="settingsDesc">Tampal URL Web App Google Apps Script (code.gs) untuk sambung ke Google Sheet. Diperlukan sekali sahaja — akan disimpan pada peranti ini.</p>
+      <input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/s/XXXX/exec">
+      <div class="modal-actions">
+        <button class="secondary" id="closeSettings"></button>
+        <button class="primary" id="saveSettings"></button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===================== CONFIG ===================== */
+var DEFAULT_API_URL = ''; // <- set your deployed Apps Script /exec URL here, or via Settings (gear icon) in-app
+var STORAGE_KEY_API = 'lautan_api_url';
+var STORAGE_KEY_DATA = 'lautan_data_cache';
+var STORAGE_KEY_LANG = 'lautan_lang';
+
+/* ===================== I18N ===================== */
+var T = {
+  ms: {
+    appName:'LAUTAN Book',
+    topSubHome:'Rujukan Farmasi',
+    tagline:'Pilih portal untuk mula carian',
+    pcTitle:'Poison C', pcDesc:'Cari maklumat penuh ubat Poison C ikut brand, bahan aktif atau indikasi',
+    pcTopSub:'Carian brand · bahan aktif · indikasi',
+    comboTitle:'Combo', comboDesc:'Taip simptom pelanggan, dapat cadangan combo untuk upsell & cross-sell',
+    comboTopSub:'Carian ikut simptom',
+    searchPcPlaceholder:'Cari brand, bahan aktif atau indikasi…',
+    searchComboPlaceholder:'Taip simptom, cth: selsema, gatal, demam…',
+    filterAll:'Semua', filterBrand:'Brand', filterActive:'Bahan Aktif', filterIndikasi:'Indikasi',
+    loading:'Memuatkan data…',
+    noData:'Tiada data', noDataDesc:'Semak sambungan Google Sheet dalam Tetapan.',
+    resultsFound:function(n){return n + ' hasil dijumpai';},
+    noMatch:'Tiada padanan', noMatchDesc:'Cuba kata kunci lain.',
+    popularSymptoms:'Simptom Popular',
+    comboPrompt:'Taip atau pilih simptom untuk lihat cadangan combo',
+    comboResults:function(n,q){return n + ' cadangan untuk "' + q + '"';},
+    comboNoMatch:'Tiada padanan', comboNoMatchDesc:'Cuba simptom lain seperti selsema, gatal atau demam.',
+    badgeMain:'UTAMA', sectionActive:'Bahan Aktif (Poison C)',
+    badgeUpsell:'UPSELL', sectionSuplemen:'Suplemen',
+    hintSuplemen:'Tawarkan suplemen ini semasa checkout untuk tambah nilai rawatan pelanggan.',
+    badgeCross:'CROSS-SELL', sectionNasal:'Nasal Spray',
+    hintNasal:'Cadangkan nasal spray sebagai rawatan tambahan untuk simptom hidung/resdung.',
+    settingsTitle:'Tetapan Sambungan',
+    settingsDesc:'Tampal URL Web App Google Apps Script (code.gs) untuk sambung ke Google Sheet. Diperlukan sekali sahaja — akan disimpan pada peranti ini.',
+    close:'Tutup', save:'Simpan & Muat Semula',
+    toastEnterUrl:'Sila masukkan URL yang sah',
+    toastSaved:'Disimpan. Memuatkan data…',
+    toastOffline:'Offline — guna data tersimpan',
+    toastLoadErr:'Ralat memuatkan data: ',
+    toastNoConn:'Tiada sambungan. Sila semak internet atau tetapan.'
+  },
+  en: {
+    appName:'LAUTAN Book',
+    topSubHome:'Pharmacy Reference',
+    tagline:'Choose a portal to start searching',
+    pcTitle:'Poison C', pcDesc:'Look up full Poison C medicine info by brand, active ingredient or indication',
+    pcTopSub:'Search brand · active ingredient · indication',
+    comboTitle:'Combo', comboDesc:'Type a customer symptom, get combo suggestions for upsell & cross-sell',
+    comboTopSub:'Search by symptom',
+    searchPcPlaceholder:'Search brand, active ingredient or indication…',
+    searchComboPlaceholder:'Type a symptom, e.g. cold, itchy, fever…',
+    filterAll:'All', filterBrand:'Brand', filterActive:'Active Ingredient', filterIndikasi:'Indication',
+    loading:'Loading data…',
+    noData:'No data', noDataDesc:'Check the Google Sheet connection in Settings.',
+    resultsFound:function(n){return n + ' results found';},
+    noMatch:'No match', noMatchDesc:'Try a different keyword.',
+    popularSymptoms:'Popular Symptoms',
+    comboPrompt:'Type or pick a symptom to see combo suggestions',
+    comboResults:function(n,q){return n + ' suggestions for "' + q + '"';},
+    comboNoMatch:'No match', comboNoMatchDesc:'Try another symptom such as cold, itchy or fever.',
+    badgeMain:'PRIMARY', sectionActive:'Active Ingredients (Poison C)',
+    badgeUpsell:'UPSELL', sectionSuplemen:'Supplements',
+    hintSuplemen:"Offer these supplements at checkout to add value to the customer's treatment.",
+    badgeCross:'CROSS-SELL', sectionNasal:'Nasal Spray',
+    hintNasal:'Suggest a nasal spray as an add-on for nasal/congestion symptoms.',
+    settingsTitle:'Connection Settings',
+    settingsDesc:'Paste the Google Apps Script (code.gs) Web App URL to connect to the Google Sheet. Needed once — saved on this device.',
+    close:'Close', save:'Save & Reload',
+    toastEnterUrl:'Please enter a valid URL',
+    toastSaved:'Saved. Loading data…',
+    toastOffline:'Offline — using saved data',
+    toastLoadErr:'Error loading data: ',
+    toastNoConn:'No connection. Check your internet or settings.'
+  }
+};
+function t(key){ return T[state.lang][key]; }
+
+/* ===================== STATE ===================== */
+var state = {
+  route: 'home',
+  lang: localStorage.getItem(STORAGE_KEY_LANG) || 'ms',
+  data: null,
+  loading: false,
+  pcQuery: '',
+  pcFilter: 'all',
+  comboQuery: ''
+};
+
+/* ===================== UTIL ===================== */
+function getApiUrl(){ return localStorage.getItem(STORAGE_KEY_API) || DEFAULT_API_URL; }
+function setApiUrl(url){ localStorage.setItem(STORAGE_KEY_API, url.trim()); }
+function norm(s){ return (s || '').toString().toLowerCase().trim(); }
+function showToast(msg, ms){
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(showToast._tm);
+  showToast._tm = setTimeout(function(){ el.classList.remove('show'); }, ms || 2400);
+}
+function escapeHtml(s){
+  return (s||'').toString().replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function highlight(text, q){
+  var safe = escapeHtml(text);
+  if (!q) return safe;
+  try{
+    var re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','ig');
+    return safe.replace(re, '<mark style="background:var(--gold-tint);color:inherit;border-radius:3px;padding:0 1px;">$1</mark>');
+  }catch(e){ return safe; }
+}
+
+/* ===================== DATA LOADING ===================== */
+function loadData(force){
+  var cached = localStorage.getItem(STORAGE_KEY_DATA);
+  if (cached && !force) {
+    try { state.data = JSON.parse(cached); } catch(e){}
+  }
+  var url = getApiUrl();
+  if (!url) {
+    if (!state.data) { render(); openSettings(); }
+    return;
+  }
+  state.loading = !state.data;
+  render();
+  fetch(url + (url.indexOf('?')>-1?'&':'?') + 'action=getData')
+    .then(function(r){ return r.json(); })
+    .then(function(json){
+      state.loading = false;
+      if (json && json.ok) {
+        state.data = json.data;
+        localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(json.data));
+        setOnline(true);
+      } else {
+        setOnline(false);
+        if (!state.data) showToast(t('toastLoadErr') + (json && json.error || 'unknown'));
+      }
+      render();
+    })
+    .catch(function(){
+      state.loading = false;
+      setOnline(false);
+      if (!state.data) showToast(t('toastNoConn'));
+      render();
+    });
+}
+function setOnline(isOnline){
+  var dot = document.getElementById('statusDot');
+  if (!dot) return;
+  dot.classList.toggle('offline', !isOnline);
+  dot.title = isOnline ? 'Online' : 'Offline';
+}
+
+/* ===================== SYMPTOM INDEX ===================== */
+function buildSymptomList(){
+  if (!state.data) return [];
+  var set = {};
+  ['poisonC','suplemen','nasal'].forEach(function(key){
+    (state.data[key]||[]).forEach(function(row){
+      var ind = row.Indikasi || '';
+      ind.split(',').forEach(function(part){
+        var w = part.trim().toLowerCase();
+        if (w) set[w] = true;
+      });
+    });
+  });
+  return Object.keys(set).sort();
+}
+
+/* ===================== ROUTING ===================== */
+function goTo(route){ state.route = route; render(); window.scrollTo(0,0); }
+
+/* ===================== RENDER: TOPBAR ===================== */
+function renderTopbar(){
+  var backBtn = document.getElementById('backBtn');
+  var wordmark = document.getElementById('homeWordmark');
+  var title = document.getElementById('pageTitle');
+  var sub = document.getElementById('pageSub');
+
+  if (state.route === 'home') {
+    backBtn.style.display = 'none';
+    wordmark.style.display = 'flex';
+    title.textContent = t('appName');
+    sub.textContent = t('topSubHome');
+  } else {
+    backBtn.style.display = 'flex';
+    wordmark.style.display = 'none';
+    if (state.route === 'poisonc') {
+      title.textContent = t('pcTitle');
+      sub.textContent = t('pcTopSub');
+    } else if (state.route === 'combo') {
+      title.textContent = t('comboTitle');
+      sub.textContent = t('comboTopSub');
+    }
+  }
+
+  document.getElementById('langMs').classList.toggle('active', state.lang==='ms');
+  document.getElementById('langEn').classList.toggle('active', state.lang==='en');
+  document.getElementById('settingsTitle').textContent = t('settingsTitle');
+  document.getElementById('settingsDesc').textContent = t('settingsDesc');
+  document.getElementById('closeSettings').textContent = t('close');
+  document.getElementById('saveSettings').textContent = t('save');
+}
+
+/* ===================== RENDER: HOME ===================== */
+function renderHome(){
+  return ''
+  + '<div class="hero">'
+  +   '<img class="mark" src="icons/icon-192.png" alt="LAUTAN Book">'
+  +   '<h2 class="serif">' + t('appName') + '</h2>'
+  +   '<p>' + t('tagline') + '</p>'
+  + '</div>'
+  + '<div class="portal-list">'
+  +   '<button class="portal-card pc" data-route="poisonc">'
+  +     '<div class="stripe"></div>'
+  +     '<div class="content">'
+  +       '<div class="icon">℞</div>'
+  +       '<div><h3>' + t('pcTitle') + '</h3><p>' + t('pcDesc') + '</p></div>'
+  +       '<div class="chev">›</div>'
+  +     '</div>'
+  +   '</button>'
+  +   '<button class="portal-card combo" data-route="combo">'
+  +     '<div class="stripe"></div>'
+  +     '<div class="content">'
+  +       '<div class="icon">✚</div>'
+  +       '<div><h3>' + t('comboTitle') + '</h3><p>' + t('comboDesc') + '</p></div>'
+  +       '<div class="chev">›</div>'
+  +     '</div>'
+  +   '</button>'
+  + '</div>'
+  + '<div class="footer-note"></div>';
+}
+
+/* ===================== RENDER: POISON C PORTAL ===================== */
+function renderPoisonC(){
+  var q = norm(state.pcQuery);
+  var rows = state.data ? (state.data.poisonC||[]) : [];
+
+  var filtered = rows.filter(function(r){
+    if (!q) return true;
+    var brand = norm(r.Brand), active = norm(r['Active Ingredient']), ind = norm(r.Indikasi);
+    if (state.pcFilter === 'brand') return brand.indexOf(q) > -1;
+    if (state.pcFilter === 'active') return active.indexOf(q) > -1;
+    if (state.pcFilter === 'indikasi') return ind.indexOf(q) > -1;
+    return brand.indexOf(q) > -1 || active.indexOf(q) > -1 || ind.indexOf(q) > -1;
+  });
+
+  var filters = [
+    {k:'all', l:t('filterAll')},
+    {k:'brand', l:t('filterBrand')},
+    {k:'active', l:t('filterActive')},
+    {k:'indikasi', l:t('filterIndikasi')}
+  ];
+
+  var html = ''
+  + '<div class="search-wrap">'
+  +   '<div class="search-box">'
+  +     '<span class="icon-lens">⌕</span>'
+  +     '<input id="pcInput" type="text" inputmode="search" autocomplete="off" placeholder="'+t('searchPcPlaceholder')+'" value="'+escapeHtml(state.pcQuery)+'">'
+  +     '<button class="clear-btn '+(state.pcQuery?'show':'')+'" id="pcClear">✕</button>'
+  +   '</div>'
+  +   '<div class="filter-row">'
+  +     filters.map(function(f){
+          return '<div class="filter-chip '+(state.pcFilter===f.k?'active':'')+'" data-filter="'+f.k+'">'+f.l+'</div>';
+        }).join('')
+  +   '</div>'
+  + '</div>';
+
+  if (state.loading && !state.data) {
+    html += '<div class="loading"><div class="spinner"></div><p>'+t('loading')+'</p></div>';
+    return html;
+  }
+  if (!rows.length) {
+    html += '<div class="empty-state"><div class="mark"></div><p><b>'+t('noData')+'</b></p><p>'+t('noDataDesc')+'</p></div>';
+    return html;
+  }
+
+  html += '<div class="result-count">'+t('resultsFound')(filtered.length)+'</div>';
+
+  if (!filtered.length) {
+    html += '<div class="empty-state"><div class="mark"></div><p><b>'+t('noMatch')+'</b></p><p>'+t('noMatchDesc')+'</p></div>';
+  } else {
+    html += '<div class="card-list">' + filtered.map(function(r){
+      return ''
+      + '<div class="med-card">'
+      +   '<div class="row1">'
+      +     '<div class="brand">'+highlight(r.Brand, state.pcQuery)+'</div>'
+      +     '<div class="active-tag">'+highlight(r['Active Ingredient'], state.pcQuery)+'</div>'
+      +   '</div>'
+      +   '<div class="indikasi">'+highlight(r.Indikasi, state.pcQuery)+'</div>'
+      +   '<div class="dos">'+escapeHtml(r.Dos)+'</div>'
+      + '</div>';
+    }).join('') + '</div>';
+  }
+  return html;
+}
+
+/* ===================== RENDER: COMBO PORTAL ===================== */
+function renderCombo(){
+  var q = norm(state.comboQuery);
+  var hasData = state.data && ((state.data.poisonC||[]).length || (state.data.suplemen||[]).length || (state.data.nasal||[]).length);
+
+  var html = ''
+  + '<div class="search-wrap">'
+  +   '<div class="search-box">'
+  +     '<span class="icon-lens">⌕</span>'
+  +     '<input id="comboInput" type="text" inputmode="search" autocomplete="off" placeholder="'+t('searchComboPlaceholder')+'" value="'+escapeHtml(state.comboQuery)+'">'
+  +     '<button class="clear-btn '+(state.comboQuery?'show':'')+'" id="comboClear">✕</button>'
+  +   '</div>'
+  + '</div>';
+
+  if (state.loading && !state.data) {
+    html += '<div class="loading"><div class="spinner"></div><p>'+t('loading')+'</p></div>';
+    return html;
+  }
+  if (!hasData) {
+    html += '<div class="empty-state"><div class="mark"></div><p><b>'+t('noData')+'</b></p><p>'+t('noDataDesc')+'</p></div>';
+    return html;
+  }
+
+  if (!q) {
+    var symptoms = buildSymptomList();
+    html += '<div class="suggest-list">'
+      + '<div class="label">'+t('popularSymptoms')+'</div>'
+      + '<div class="chip-cloud">' + symptoms.map(function(s){
+          return '<div class="sym-chip" data-sym="'+escapeHtml(s)+'">'+escapeHtml(s)+'</div>';
+        }).join('') + '</div>'
+      + '</div>';
+    html += '<div class="empty-state" style="padding-top:30px;"><div class="mark"></div><p>'+t('comboPrompt')+'</p></div>';
+    return html;
+  }
+
+  var pc = (state.data.poisonC||[]).filter(function(r){ return norm(r.Indikasi).indexOf(q) > -1; });
+  var sup = (state.data.suplemen||[]).filter(function(r){ return norm(r.Indikasi).indexOf(q) > -1; });
+  var nas = (state.data.nasal||[]).filter(function(r){ return norm(r.Indikasi).indexOf(q) > -1; });
+
+  var total = pc.length + sup.length + nas.length;
+  html += '<div class="result-count">'+t('comboResults')(total, escapeHtml(state.comboQuery))+'</div>';
+
+  if (!total) {
+    html += '<div class="empty-state"><div class="mark"></div><p><b>'+t('comboNoMatch')+'</b></p><p>'+t('comboNoMatchDesc')+'</p></div>';
+    return html;
+  }
+
+  if (pc.length) {
+    html += '<div class="combo-section"><h4><span class="badge">'+t('badgeMain')+'</span>'+t('sectionActive')+'</h4>'
+      + '<div class="card-list">' + pc.map(function(r){
+          return ''
+          + '<div class="med-card">'
+          +   '<div class="row1">'
+          +     '<div class="brand">'+escapeHtml(r.Brand)+'</div>'
+          +     '<div class="active-tag">'+escapeHtml(r['Active Ingredient'])+'</div>'
+          +   '</div>'
+          +   '<div class="indikasi">'+highlight(r.Indikasi, state.comboQuery)+'</div>'
+          +   '<div class="dos">'+escapeHtml(r.Dos)+'</div>'
+          + '</div>';
+        }).join('') + '</div></div>';
+  }
+
+  if (sup.length) {
+    html += '<div class="combo-section suplemen"><h4><span class="badge">'+t('badgeUpsell')+'</span>'+t('sectionSuplemen')+'</h4>'
+      + '<div class="combo-hint">'+t('hintSuplemen')+'</div>'
+      + '<div class="card-list" style="margin-top:10px;">' + sup.map(function(r){
+          return ''
+          + '<div class="med-card tone-gold">'
+          +   '<div class="row1"><div class="brand">'+escapeHtml(r.Suplemen)+'</div></div>'
+          +   '<div class="indikasi">'+highlight(r.Indikasi, state.comboQuery)+'</div>'
+          +   '<div class="dos">'+escapeHtml(r.Dos)+'</div>'
+          + '</div>';
+        }).join('') + '</div></div>';
+  }
+
+  if (nas.length) {
+    html += '<div class="combo-section nasal"><h4><span class="badge">'+t('badgeCross')+'</span>'+t('sectionNasal')+'</h4>'
+      + '<div class="combo-hint">'+t('hintNasal')+'</div>'
+      + '<div class="card-list" style="margin-top:10px;">' + nas.map(function(r){
+          return ''
+          + '<div class="med-card tone-teal">'
+          +   '<div class="row1"><div class="brand">'+escapeHtml(r['Nasal spray'])+'</div></div>'
+          +   '<div class="indikasi">'+highlight(r.Indikasi, state.comboQuery)+'</div>'
+          +   '<div class="dos">'+escapeHtml(r.Dos)+'</div>'
+          + '</div>';
+        }).join('') + '</div></div>';
+  }
+
+  return html;
+}
+
+/* ===================== MASTER RENDER ===================== */
+function render(){
+  renderTopbar();
+  var main = document.getElementById('main');
+  if (state.route === 'home') main.innerHTML = renderHome();
+  else if (state.route === 'poisonc') main.innerHTML = renderPoisonC();
+  else if (state.route === 'combo') main.innerHTML = renderCombo();
+  bindEvents();
+}
+
+/* ===================== EVENTS ===================== */
+function bindEvents(){
+  if (state.route === 'home') {
+    document.querySelectorAll('.portal-card').forEach(function(el){
+      el.addEventListener('click', function(){ goTo(el.getAttribute('data-route')); });
+    });
+  }
+  if (state.route === 'poisonc') {
+    var input = document.getElementById('pcInput');
+    if (input) {
+      input.addEventListener('input', function(){
+        state.pcQuery = input.value;
+        render();
+        var i2 = document.getElementById('pcInput');
+        if (i2) { i2.focus(); i2.setSelectionRange(i2.value.length, i2.value.length); }
+      });
+    }
+    var clearBtn = document.getElementById('pcClear');
+    if (clearBtn) clearBtn.addEventListener('click', function(){ state.pcQuery=''; render(); });
+    document.querySelectorAll('.filter-chip').forEach(function(el){
+      el.addEventListener('click', function(){ state.pcFilter = el.getAttribute('data-filter'); render(); });
+    });
+  }
+  if (state.route === 'combo') {
+    var cInput = document.getElementById('comboInput');
+    if (cInput) {
+      cInput.addEventListener('input', function(){
+        state.comboQuery = cInput.value;
+        render();
+        var i2 = document.getElementById('comboInput');
+        if (i2) { i2.focus(); i2.setSelectionRange(i2.value.length, i2.value.length); }
+      });
+    }
+    var cClear = document.getElementById('comboClear');
+    if (cClear) cClear.addEventListener('click', function(){ state.comboQuery=''; render(); });
+    document.querySelectorAll('.sym-chip').forEach(function(el){
+      el.addEventListener('click', function(){ state.comboQuery = el.getAttribute('data-sym'); render(); });
+    });
+  }
+}
+
+document.getElementById('backBtn').addEventListener('click', function(){ goTo('home'); });
+
+/* LANGUAGE */
+document.getElementById('langToggle').addEventListener('click', function(e){
+  var btn = e.target.closest('button[data-lang]');
+  if (!btn) return;
+  state.lang = btn.getAttribute('data-lang');
+  localStorage.setItem(STORAGE_KEY_LANG, state.lang);
+  render();
+});
+
+/* SETTINGS MODAL */
+function openSettings(){
+  document.getElementById('apiUrlInput').value = getApiUrl();
+  document.getElementById('settingsModal').classList.add('show');
+}
+function closeSettingsModal(){ document.getElementById('settingsModal').classList.remove('show'); }
+document.getElementById('settingsBtn').addEventListener('click', openSettings);
+document.getElementById('closeSettings').addEventListener('click', closeSettingsModal);
+document.getElementById('settingsModal').addEventListener('click', function(e){
+  if (e.target.id === 'settingsModal') closeSettingsModal();
+});
+document.getElementById('saveSettings').addEventListener('click', function(){
+  var val = document.getElementById('apiUrlInput').value.trim();
+  if (!val) { showToast(t('toastEnterUrl')); return; }
+  setApiUrl(val);
+  closeSettingsModal();
+  showToast(t('toastSaved'));
+  loadData(true);
+});
+
+/* ONLINE / OFFLINE */
+window.addEventListener('online', function(){ setOnline(true); loadData(true); });
+window.addEventListener('offline', function(){ setOnline(false); showToast(t('toastOffline')); });
+
+/* ===================== INIT ===================== */
+render();
+loadData(false);
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
