@@ -65,6 +65,16 @@
   .topbar .sub{font-size:11px;opacity:0.72;margin-top:2px;letter-spacing:0.15px;}
   .topbar .wordmark{display:flex;align-items:center;gap:9px;}
   .topbar .wordmark img{width:26px;height:26px;border-radius:6px;background:#fff;padding:2px;flex-shrink:0;}
+  .icon-fallback{
+    width:26px;height:26px;border-radius:6px;background:var(--gold);color:var(--navy-deep);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;
+    font-family:Georgia,serif;
+  }
+  .icon-fallback-lg{
+    width:54px;height:54px;border-radius:14px;background:var(--gold);color:var(--navy-deep);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:26px;
+    margin:0 auto 12px;font-family:Georgia,serif;box-shadow:0 4px 14px rgba(15,62,99,0.18);
+  }
 
   .top-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
   .lang-toggle{display:flex;background:rgba(255,255,255,0.1);border-radius:20px;padding:2px;}
@@ -114,7 +124,10 @@
   .portal-card p{margin:0;font-size:12px;color:var(--ink-soft);line-height:1.4;}
   .portal-card .chev{margin-left:auto;color:var(--ink-faint);font-size:18px;flex-shrink:0;padding-right:16px;}
 
-  .footer-note{height:8px;}
+  .footer-note{
+    text-align:center;font-size:11px;color:var(--ink-faint);
+    margin-top:22px;padding-bottom:6px;letter-spacing:0.3px;
+  }
 
   .search-wrap{position:sticky;top:0;z-index:15;background:var(--cream);padding:14px 0 8px;}
   .search-box{
@@ -165,6 +178,10 @@
   .med-card .active-tag{
     font-size:10px;font-weight:700;color:var(--navy);background:var(--teal-tint);
     padding:3px 9px;border-radius:7px;white-space:nowrap;text-transform:capitalize;
+  }
+  .med-card .group-tag{
+    display:inline-block;font-size:10.5px;color:var(--gold-dark);background:var(--gold-tint);
+    padding:2px 8px;border-radius:6px;margin-top:7px;font-weight:600;
   }
   .med-card .indikasi{font-size:12.5px;color:var(--ink-soft);margin-top:6px;line-height:1.45;}
   .med-card .dos{
@@ -244,7 +261,7 @@
     <div class="topbar-row">
       <button class="back" id="backBtn" style="display:none;" aria-label="Back">←</button>
       <div class="wordmark" id="homeWordmark">
-        <img src="icons/icon-192.png" alt="LAUTAN Book">
+        <img src="./icons/icon-192.png" alt="LAUTAN Book" onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('div'),{className:'icon-fallback',textContent:'L'}));">
       </div>
       <div class="titles">
         <h1 class="serif" id="pageTitle">LAUTAN Book</h1>
@@ -443,7 +460,7 @@ function buildSymptomList(){
   var set = {};
   ['poisonC','suplemen','nasal'].forEach(function(key){
     (state.data[key]||[]).forEach(function(row){
-      var ind = row.Indikasi || '';
+      var ind = row.Indication || '';
       ind.split(',').forEach(function(part){
         var w = part.trim().toLowerCase();
         if (w) set[w] = true;
@@ -492,7 +509,7 @@ function renderTopbar(){
 function renderHome(){
   return ''
   + '<div class="hero">'
-  +   '<img class="mark" src="icons/icon-192.png" alt="LAUTAN Book">'
+  +   '<img class="mark" src="./icons/icon-192.png" alt="LAUTAN Book" onerror="this.onerror=null;this.outerHTML=\'<div class=&quot;mark icon-fallback-lg&quot;>L</div>\';">'
   +   '<h2 class="serif">' + t('appName') + '</h2>'
   +   '<p>' + t('tagline') + '</p>'
   + '</div>'
@@ -514,7 +531,7 @@ function renderHome(){
   +     '</div>'
   +   '</button>'
   + '</div>'
-  + '<div class="footer-note"></div>';
+  + '<div class="footer-note">LAUTAN Book v1.2</div>';
 }
 
 /* ===================== RENDER: POISON C PORTAL ===================== */
@@ -524,7 +541,7 @@ function renderPoisonC(){
 
   var filtered = rows.filter(function(r){
     if (!q) return true;
-    var brand = norm(r.Brand), active = norm(r['Active Ingredient']), ind = norm(r.Indikasi);
+    var brand = norm(r.Brand), active = norm(r['Active Ingredient']), ind = norm(r.Indication);
     if (state.pcFilter === 'brand') return brand.indexOf(q) > -1;
     if (state.pcFilter === 'active') return active.indexOf(q) > -1;
     if (state.pcFilter === 'indikasi') return ind.indexOf(q) > -1;
@@ -573,8 +590,9 @@ function renderPoisonC(){
       +     '<div class="brand">'+highlight(r.Brand, state.pcQuery)+'</div>'
       +     '<div class="active-tag">'+highlight(r['Active Ingredient'], state.pcQuery)+'</div>'
       +   '</div>'
-      +   '<div class="indikasi">'+highlight(r.Indikasi, state.pcQuery)+'</div>'
-      +   '<div class="dos">'+escapeHtml(r.Dos)+'</div>'
+      +   (r.Group ? '<div class="group-tag">'+escapeHtml(r.Group)+'</div>' : '')
+      +   '<div class="indikasi">'+highlight(r.Indication, state.pcQuery)+'</div>'
+      +   '<div class="dos">'+escapeHtml(r.Dose)+'</div>'
       + '</div>';
     }).join('') + '</div>';
   }
@@ -616,9 +634,9 @@ function renderCombo(){
     return html;
   }
 
-  var pc = (state.data.poisonC||[]).filter(function(r){ return norm(r.Indikasi).indexOf(q) > -1; });
-  var sup = (state.data.suplemen||[]).filter(function(r){ return norm(r.Indikasi).indexOf(q) > -1; });
-  var nas = (state.data.nasal||[]).filter(function(r){ return norm(r.Indikasi).indexOf(q) > -1; });
+  var pc = (state.data.poisonC||[]).filter(function(r){ return norm(r.Indication).indexOf(q) > -1; });
+  var sup = (state.data.suplemen||[]).filter(function(r){ return norm(r.Indication).indexOf(q) > -1; });
+  var nas = (state.data.nasal||[]).filter(function(r){ return norm(r.Indication).indexOf(q) > -1; });
 
   var total = pc.length + sup.length + nas.length;
   html += '<div class="result-count">'+t('comboResults')(total, escapeHtml(state.comboQuery))+'</div>';
@@ -637,8 +655,9 @@ function renderCombo(){
           +     '<div class="brand">'+escapeHtml(r.Brand)+'</div>'
           +     '<div class="active-tag">'+escapeHtml(r['Active Ingredient'])+'</div>'
           +   '</div>'
-          +   '<div class="indikasi">'+highlight(r.Indikasi, state.comboQuery)+'</div>'
-          +   '<div class="dos">'+escapeHtml(r.Dos)+'</div>'
+          +   (r.Group ? '<div class="group-tag">'+escapeHtml(r.Group)+'</div>' : '')
+          +   '<div class="indikasi">'+highlight(r.Indication, state.comboQuery)+'</div>'
+          +   '<div class="dos">'+escapeHtml(r.Dose)+'</div>'
           + '</div>';
         }).join('') + '</div></div>';
   }
@@ -649,9 +668,12 @@ function renderCombo(){
       + '<div class="card-list" style="margin-top:10px;">' + sup.map(function(r){
           return ''
           + '<div class="med-card tone-gold">'
-          +   '<div class="row1"><div class="brand">'+escapeHtml(r.Suplemen)+'</div></div>'
-          +   '<div class="indikasi">'+highlight(r.Indikasi, state.comboQuery)+'</div>'
-          +   '<div class="dos">'+escapeHtml(r.Dos)+'</div>'
+          +   '<div class="row1">'
+          +     '<div class="brand">'+escapeHtml(r.Supplement)+'</div>'
+          +     (r['Active ingredient'] ? '<div class="active-tag">'+escapeHtml(r['Active ingredient'])+'</div>' : '')
+          +   '</div>'
+          +   '<div class="indikasi">'+highlight(r.Indication, state.comboQuery)+'</div>'
+          +   '<div class="dos">'+escapeHtml(r.Dose)+'</div>'
           + '</div>';
         }).join('') + '</div></div>';
   }
@@ -662,9 +684,9 @@ function renderCombo(){
       + '<div class="card-list" style="margin-top:10px;">' + nas.map(function(r){
           return ''
           + '<div class="med-card tone-teal">'
-          +   '<div class="row1"><div class="brand">'+escapeHtml(r['Nasal spray'])+'</div></div>'
-          +   '<div class="indikasi">'+highlight(r.Indikasi, state.comboQuery)+'</div>'
-          +   '<div class="dos">'+escapeHtml(r.Dos)+'</div>'
+          +   '<div class="row1"><div class="brand">'+escapeHtml(r.Description)+'</div></div>'
+          +   '<div class="indikasi">'+highlight(r.Indication, state.comboQuery)+'</div>'
+          +   '<div class="dos">'+escapeHtml(r.Dose)+'</div>'
           + '</div>';
         }).join('') + '</div></div>';
   }
