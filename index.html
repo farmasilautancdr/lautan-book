@@ -276,6 +276,27 @@
   }
   .toast.show{opacity:1;transform:translateY(0);}
 
+  .install-banner{
+    position:fixed;left:12px;right:12px;bottom:calc(14px + var(--safe-bottom));
+    background:var(--navy-deep);color:#fff;border-radius:14px;
+    padding:13px 12px 13px 16px;box-shadow:0 8px 22px rgba(0,0,0,0.28);
+    z-index:55;display:flex;align-items:center;gap:10px;
+    opacity:0;transform:translateY(16px);pointer-events:none;
+    transition:opacity .25s, transform .25s;
+  }
+  .install-banner.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+  .install-banner-text{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;}
+  .install-banner-text strong{font-size:13px;font-weight:700;}
+  .install-banner-text span{font-size:11.5px;color:rgba(255,255,255,0.75);line-height:1.35;}
+  .install-banner-btn{
+    background:var(--gold);color:var(--navy-deep);border:none;border-radius:9px;
+    padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer;flex-shrink:0;
+  }
+  .install-banner-close{
+    background:none;border:none;color:rgba(255,255,255,0.65);font-size:13px;cursor:pointer;
+    flex-shrink:0;padding:4px;
+  }
+
   .modal-overlay{
     position:fixed;inset:0;background:rgba(10,44,72,0.45);z-index:60;
     display:none;align-items:flex-end;justify-content:center;
@@ -357,6 +378,15 @@
 
   <div class="toast" id="toast"></div>
 
+  <div class="install-banner" id="installBanner">
+    <div class="install-banner-text">
+      <strong id="installBannerTitle"></strong>
+      <span id="installBannerDesc"></span>
+    </div>
+    <button class="install-banner-btn" id="installBannerBtn" style="display:none;"></button>
+    <button class="install-banner-close" id="installBannerClose" aria-label="Close">✕</button>
+  </div>
+
   <div class="modal-overlay" id="settingsModal">
     <div class="modal">
       <h3 id="settingsTitle">Tetapan Sambungan</h3>
@@ -396,7 +426,7 @@ var T = {
     comboTopSub:'Carian ikut simptom',
     searchPcPlaceholder:'Cari brand, bahan aktif atau indikasi…',
     searchComboPlaceholder:'Taip simptom, cth: selsema, gatal, demam…',
-    filterAll:'Semua', filterBrand:'Brand', filterActive:'Bahan Aktif', filterIndikasi:'Indikasi',
+    filterAll:'Semua', filterBrand:'Brand', filterActive:'Bahan Aktif', filterIndication:'Indikasi',
     loading:'Memuatkan data…',
     noData:'Tiada data', noDataDesc:'Semak sambungan Google Sheet dalam Tetapan.',
     resultsFound:function(n){return n + ' hasil dijumpai';},
@@ -427,7 +457,12 @@ var T = {
     statsTotal:function(n){return n + ' rekod carian direkod';},
     statsEmpty:'Belum ada data statistik lagi.',
     statsLoading:'Memuatkan statistik…',
-    statsErr:'Gagal memuatkan statistik.'
+    statsErr:'Gagal memuatkan statistik.',
+    installTitle:'Pasang LAUTAN Book',
+    installDesc:'Pasang sebagai app untuk ikon & akses yang betul di skrin utama.',
+    installBtn:'Pasang',
+    installIosDesc:'iPhone: tekan ikon Share, pilih "Add to Home Screen".',
+    toastInstalled:'LAUTAN Book berjaya dipasang!'
   },
   en: {
     appName:'LAUTAN Book',
@@ -439,7 +474,7 @@ var T = {
     comboTopSub:'Search by symptom',
     searchPcPlaceholder:'Search brand, active ingredient or indication…',
     searchComboPlaceholder:'Type a symptom, e.g. cold, itchy, fever…',
-    filterAll:'All', filterBrand:'Brand', filterActive:'Active Ingredient', filterIndikasi:'Indication',
+    filterAll:'All', filterBrand:'Brand', filterActive:'Active Ingredient', filterIndication:'Indication',
     loading:'Loading data…',
     noData:'No data', noDataDesc:'Check the Google Sheet connection in Settings.',
     resultsFound:function(n){return n + ' results found';},
@@ -470,7 +505,12 @@ var T = {
     statsTotal:function(n){return n + ' search events logged';},
     statsEmpty:'No usage data yet.',
     statsLoading:'Loading stats…',
-    statsErr:'Could not load stats.'
+    statsErr:'Could not load stats.',
+    installTitle:'Install LAUTAN Book',
+    installDesc:'Install as an app for the correct icon and quick access.',
+    installBtn:'Install',
+    installIosDesc:'iPhone: tap the Share icon, then choose "Add to Home Screen".',
+    toastInstalled:'LAUTAN Book installed successfully!'
   }
 };
 function t(key){ return T[state.lang][key]; }
@@ -744,7 +784,7 @@ function renderPoisonC(){
     var brand = norm(r.Brand), active = norm(r['Active Ingredient']), ind = norm(r.Indication);
     if (state.pcFilter === 'brand') return brand.indexOf(q) > -1;
     if (state.pcFilter === 'active') return active.indexOf(q) > -1;
-    if (state.pcFilter === 'indikasi') return ind.indexOf(q) > -1;
+    if (state.pcFilter === 'indication') return ind.indexOf(q) > -1;
     return brand.indexOf(q) > -1 || active.indexOf(q) > -1 || ind.indexOf(q) > -1;
   });
 
@@ -752,7 +792,7 @@ function renderPoisonC(){
     {k:'all', l:t('filterAll')},
     {k:'brand', l:t('filterBrand')},
     {k:'active', l:t('filterActive')},
-    {k:'indikasi', l:t('filterIndikasi')}
+    {k:'indication', l:t('filterIndication')}
   ];
 
   var html = ''
@@ -1026,6 +1066,7 @@ document.getElementById('langToggle').addEventListener('click', function(e){
   state.lang = btn.getAttribute('data-lang');
   localStorage.setItem(STORAGE_KEY_LANG, state.lang);
   render();
+  if (document.getElementById('installBanner').classList.contains('show')) paintInstallBanner();
 });
 
 /* SETTINGS MODAL */
@@ -1102,15 +1143,71 @@ document.getElementById('statsToggleBtn').addEventListener('click', function(){
 window.addEventListener('online', function(){ setOnline(true); loadData(true); });
 window.addEventListener('offline', function(){ setOnline(false); showToast(t('toastOffline')); });
 
+/* INSTALL BANNER
+   Guides people through the browser's real "Install app" flow instead of the
+   generic "Add to Home screen" shortcut, which is what produces a proper
+   home-screen icon (a screenshot-style icon usually means the basic shortcut
+   path was used instead of a full PWA install). */
+var deferredInstallPrompt = null;
+function isIosDevice(){ return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+function isStandaloneMode(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function paintInstallBanner(){
+  document.getElementById('installBannerTitle').textContent = t('installTitle');
+  var btn = document.getElementById('installBannerBtn');
+  var desc = document.getElementById('installBannerDesc');
+  if (deferredInstallPrompt) {
+    desc.textContent = t('installDesc');
+    btn.textContent = t('installBtn');
+    btn.style.display = 'inline-block';
+  } else {
+    desc.textContent = t('installIosDesc');
+    btn.style.display = 'none';
+  }
+}
+function showInstallBanner(){
+  paintInstallBanner();
+  document.getElementById('installBanner').classList.add('show');
+}
+function hideInstallBanner(){
+  document.getElementById('installBanner').classList.remove('show');
+}
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  showInstallBanner();
+});
+window.addEventListener('appinstalled', function(){
+  deferredInstallPrompt = null;
+  hideInstallBanner();
+  showToast(t('toastInstalled'));
+});
+document.getElementById('installBannerBtn').addEventListener('click', function(){
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.finally(function(){
+    deferredInstallPrompt = null;
+    hideInstallBanner();
+  });
+});
+document.getElementById('installBannerClose').addEventListener('click', hideInstallBanner);
+
 /* ===================== INIT ===================== */
 render();
 loadData(false);
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
   });
 }
+
+// iOS never fires beforeinstallprompt - show a one-time manual tip instead
+if (isIosDevice() && !isStandaloneMode()) {
+  setTimeout(showInstallBanner, 1200);
+}
 </script>
+
 </body>
 </html>
