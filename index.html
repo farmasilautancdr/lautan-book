@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>LAUTAN Book</title>
-<meta name="theme-color" content="#123A5F">
+<meta name="theme-color" content="#0F3E63">
 <meta name="description" content="Rujukan Poison C dan cadangan combo untuk operasi farmasi">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="LAUTAN Book">
@@ -124,6 +125,13 @@
   .portal-card p{margin:0;font-size:12px;color:var(--ink-soft);line-height:1.4;}
   .portal-card .chev{margin-left:auto;color:var(--ink-faint);font-size:18px;flex-shrink:0;padding-right:16px;}
 
+  .sync-note{
+    font-size:11px;color:var(--ink-faint);
+    display:flex;align-items:center;gap:6px;background:var(--paper);
+    border:1px solid var(--line);border-radius:20px;padding:6px 14px;
+    width:fit-content;margin:20px auto 0;
+  }
+  .sync-note::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;}
   .footer-note{
     text-align:center;font-size:11px;color:var(--ink-faint);
     margin-top:22px;padding-bottom:6px;letter-spacing:0.3px;
@@ -173,8 +181,14 @@
   }
   .med-card.tone-gold{border-left-color:var(--gold);}
   .med-card.tone-teal{border-left-color:var(--teal);}
-  .med-card .row1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .med-card .row1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .med-card .row1-main{display:flex;align-items:center;gap:7px;flex-wrap:wrap;flex:1;min-width:0;}
   .med-card .brand{font-size:15.5px;font-weight:700;color:var(--navy-deep);text-transform:capitalize;}
+  .fav-btn{
+    border:none;background:none;cursor:pointer;font-size:18px;line-height:1;
+    color:var(--ink-faint);flex-shrink:0;padding:0 0 0 4px;
+  }
+  .fav-btn.active{color:var(--gold);}
   .med-card .active-tag{
     font-size:10px;font-weight:700;color:var(--navy);background:var(--teal-tint);
     padding:3px 9px;border-radius:7px;white-space:nowrap;text-transform:capitalize;
@@ -188,11 +202,20 @@
     margin-top:8px;font-size:12px;color:var(--navy-deep);font-weight:700;
     padding-top:8px;border-top:1px dashed var(--line);
   }
+  .counsel-note{
+    margin-top:8px;font-size:12px;color:var(--ink-soft);background:var(--cream);
+    border-left:2px solid var(--gold);border-radius:6px;padding:8px 10px;line-height:1.4;
+  }
+  .counsel-label{
+    display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;
+    color:var(--gold-dark);margin-bottom:2px;
+  }
 
   .combo-section{margin-top:4px;}
   .combo-section h4{
     font-size:11.5px;text-transform:uppercase;letter-spacing:0.6px;
     color:var(--ink-soft);margin:18px 2px 8px;display:flex;align-items:center;gap:8px;font-weight:700;
+    cursor:pointer;user-select:none;
   }
   .combo-section h4 .badge{
     background:var(--navy-dark);color:#fff;font-size:9.5px;padding:2px 8px;border-radius:9px;
@@ -204,6 +227,32 @@
     font-size:11.5px;color:var(--ink-soft);background:var(--teal-tint);border-radius:var(--radius-sm);
     padding:9px 12px;margin-top:2px;line-height:1.4;
   }
+
+  /* ===== COLLAPSIBLE ===== */
+  .group-block{margin-bottom:12px;}
+  .group-block:last-child{margin-bottom:0;}
+  .collapsible-header{
+    display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;
+    padding:9px 2px;border-bottom:1px solid var(--line);
+  }
+  .collapsible-header .group-name{
+    font-size:13.5px;font-weight:700;color:var(--navy-deep);text-transform:capitalize;
+  }
+  .collapsible-header.pc-group-toggle{margin-bottom:8px;}
+  .group-count{
+    font-size:10.5px;font-weight:700;color:var(--ink-soft);background:var(--cream);
+    border:1px solid var(--line);padding:1px 8px;border-radius:10px;
+  }
+  h4.combo-toggle .group-count{margin-left:auto;background:var(--paper);}
+  .collapsible-header .group-name ~ .group-count{margin-left:auto;}
+  .chevron{
+    font-size:14px;color:var(--ink-faint);transition:transform .15s ease;flex-shrink:0;
+  }
+  .collapsible-header.collapsed .chevron{transform:rotate(-90deg);}
+  .collapsible-body{
+    max-height:none;overflow:hidden;
+  }
+  .collapsible-body.collapsed{display:none;}
 
   .empty-state{text-align:center;padding:46px 20px;color:var(--ink-soft);}
   .empty-state .mark{width:34px;height:2px;background:var(--gold);margin:0 auto 16px;border-radius:2px;}
@@ -252,6 +301,29 @@
     background:none;border:1.5px solid var(--line);color:var(--ink-soft);border-radius:9px;
     padding:12px 16px;font-size:14px;cursor:pointer;
   }
+  .stats-block{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;}
+  .stats-toggle-btn{
+    width:100%;background:var(--cream);border:1px solid var(--line);color:var(--navy-deep);
+    border-radius:9px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;
+  }
+  .stats-panel{margin-top:12px;}
+  .stats-panel h5{
+    font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--ink-faint);
+    margin:12px 0 6px;font-weight:700;
+  }
+  .stats-panel h5:first-child{margin-top:0;}
+  .stats-row-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;
+  }
+  .stats-row-item:last-child{border-bottom:none;}
+  .stats-row-item .lbl{color:var(--ink);text-transform:capitalize;}
+  .stats-row-item .cnt{
+    font-weight:700;color:var(--navy);background:var(--teal-tint);
+    padding:2px 9px;border-radius:9px;font-size:11.5px;
+  }
+  .stats-total{font-size:11.5px;color:var(--ink-faint);margin-top:10px;text-align:center;}
+  .stats-msg{font-size:12.5px;color:var(--ink-soft);text-align:center;padding:14px 0;}
 </style>
 </head>
 <body>
@@ -294,6 +366,10 @@
         <button class="secondary" id="closeSettings"></button>
         <button class="primary" id="saveSettings"></button>
       </div>
+      <div class="stats-block">
+        <button class="stats-toggle-btn" id="statsToggleBtn"></button>
+        <div class="stats-panel" id="statsPanel" style="display:none;"></div>
+      </div>
     </div>
   </div>
 
@@ -305,6 +381,8 @@ var DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbw_ukNz1hkvXNsZAL
 var STORAGE_KEY_API = 'lautan_api_url';
 var STORAGE_KEY_DATA = 'lautan_data_cache';
 var STORAGE_KEY_LANG = 'lautan_lang';
+var STORAGE_KEY_FAV = 'lautan_pc_favorites';
+var STORAGE_KEY_RECENT = 'lautan_pc_recent';
 
 /* ===================== I18N ===================== */
 var T = {
@@ -330,8 +408,8 @@ var T = {
     badgeMain:'UTAMA', sectionActive:'Bahan Aktif (Poison C)',
     badgeUpsell:'UPSELL', sectionSuplemen:'Suplemen',
     hintSuplemen:'Tawarkan suplemen ini semasa checkout untuk tambah nilai rawatan pelanggan.',
-    badgeCross:'CROSS-SELL', sectionNasal:'Nasal Spray',
-    hintNasal:'Cadangkan nasal spray sebagai rawatan tambahan untuk simptom hidung/resdung.',
+    badgeCross:'CROSS-SELL', sectionNasal:'Add-On',
+    hintNasal:'Cadangkan add-on ini sebagai rawatan tambahan mengikut simptom pelanggan.',
     settingsTitle:'Tetapan Sambungan',
     settingsDesc:'Tampal URL Web App Google Apps Script (code.gs) untuk sambung ke Google Sheet. Diperlukan sekali sahaja — akan disimpan pada peranti ini.',
     close:'Tutup', save:'Simpan & Muat Semula',
@@ -339,7 +417,17 @@ var T = {
     toastSaved:'Disimpan. Memuatkan data…',
     toastOffline:'Offline — guna data tersimpan',
     toastLoadErr:'Ralat memuatkan data: ',
-    toastNoConn:'Tiada sambungan. Sila semak internet atau tetapan.'
+    toastNoConn:'Tiada sambungan. Sila semak internet atau tetapan.',
+    favTitle:'Kegemaran', recentTitle:'Baru Dilihat',
+    counselLabel:'Nota Kaunseling',
+    syncNote:function(d){return 'Data disegerak: ' + d;},
+    viewStatsBtn:'Lihat Statistik Penggunaan',
+    statsTitle:'Statistik Penggunaan',
+    statsTopBrand:'Brand Paling Dicari', statsTopSymptom:'Simptom Paling Dicari',
+    statsTotal:function(n){return n + ' rekod carian direkod';},
+    statsEmpty:'Belum ada data statistik lagi.',
+    statsLoading:'Memuatkan statistik…',
+    statsErr:'Gagal memuatkan statistik.'
   },
   en: {
     appName:'LAUTAN Book',
@@ -363,8 +451,8 @@ var T = {
     badgeMain:'PRIMARY', sectionActive:'Active Ingredients (Poison C)',
     badgeUpsell:'UPSELL', sectionSuplemen:'Supplements',
     hintSuplemen:"Offer these supplements at checkout to add value to the customer's treatment.",
-    badgeCross:'CROSS-SELL', sectionNasal:'Nasal Spray',
-    hintNasal:'Suggest a nasal spray as an add-on for nasal/congestion symptoms.',
+    badgeCross:'CROSS-SELL', sectionNasal:'Add-On',
+    hintNasal:"Suggest this add-on as a supplementary treatment based on the customer's symptoms.",
     settingsTitle:'Connection Settings',
     settingsDesc:'Paste the Google Apps Script (code.gs) Web App URL to connect to the Google Sheet. Needed once — saved on this device.',
     close:'Close', save:'Save & Reload',
@@ -372,7 +460,17 @@ var T = {
     toastSaved:'Saved. Loading data…',
     toastOffline:'Offline — using saved data',
     toastLoadErr:'Error loading data: ',
-    toastNoConn:'No connection. Check your internet or settings.'
+    toastNoConn:'No connection. Check your internet or settings.',
+    favTitle:'Favorites', recentTitle:'Recently Viewed',
+    counselLabel:'Counselling Note',
+    syncNote:function(d){return 'Data synced: ' + d;},
+    viewStatsBtn:'View Usage Analytics',
+    statsTitle:'Usage Analytics',
+    statsTopBrand:'Most Searched Brands', statsTopSymptom:'Most Searched Symptoms',
+    statsTotal:function(n){return n + ' search events logged';},
+    statsEmpty:'No usage data yet.',
+    statsLoading:'Loading stats…',
+    statsErr:'Could not load stats.'
   }
 };
 function t(key){ return T[state.lang][key]; }
@@ -385,13 +483,52 @@ var state = {
   loading: false,
   pcQuery: '',
   pcFilter: 'all',
-  comboQuery: ''
+  pcCollapsed: {},
+  comboQuery: '',
+  comboCollapsed: {},
+  pcFavorites: loadJSON(STORAGE_KEY_FAV, []),
+  pcRecent: loadJSON(STORAGE_KEY_RECENT, []),
+  statsOpen: false,
+  statsLoading: false,
+  statsData: null,
+  statsError: false
 };
 
 /* ===================== UTIL ===================== */
 function getApiUrl(){ return localStorage.getItem(STORAGE_KEY_API) || DEFAULT_API_URL; }
 function setApiUrl(url){ localStorage.setItem(STORAGE_KEY_API, url.trim()); }
 function norm(s){ return (s || '').toString().toLowerCase().trim(); }
+function loadJSON(key, fallback){
+  try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function saveJSON(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+}
+function brandKey(r){ return norm(r.Brand) + '|' + norm(r['Active Ingredient']); }
+function getCounsellingNote(r){
+  return r['Counselling Note'] || r['Counseling Note'] || r['Nota Kaunseling'] || '';
+}
+function logEvent(type, value){
+  var url = getApiUrl();
+  if (!url || !value) return;
+  var q = url + (url.indexOf('?')>-1?'&':'?') + 'action=logEvent'
+    + '&type=' + encodeURIComponent(type)
+    + '&value=' + encodeURIComponent(value)
+    + '&lang=' + encodeURIComponent(state.lang);
+  fetch(q).catch(function(){});
+}
+function debounce(fn, ms){
+  var tm;
+  return function(){
+    var args = arguments;
+    clearTimeout(tm);
+    tm = setTimeout(function(){ fn.apply(null, args); }, ms);
+  };
+}
+var debouncedLogSearch = debounce(function(type, value){
+  if (value && value.trim().length >= 3) logEvent(type, value.trim());
+}, 700);
 function showToast(msg, ms){
   var el = document.getElementById('toast');
   el.textContent = msg;
@@ -411,6 +548,67 @@ function highlight(text, q){
     var re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','ig');
     return safe.replace(re, '<mark style="background:var(--gold-tint);color:inherit;border-radius:3px;padding:0 1px;">$1</mark>');
   }catch(e){ return safe; }
+}
+function groupBy(rows, key){
+  var order = [], map = {};
+  rows.forEach(function(r){
+    var k = (r[key] || '—').toString();
+    if (!map[k]) { map[k] = []; order.push(k); }
+    map[k].push(r);
+  });
+  return order.map(function(k){ return {key:k, rows:map[k]}; });
+}
+function toggleFavorite(key){
+  var idx = state.pcFavorites.indexOf(key);
+  if (idx > -1) state.pcFavorites.splice(idx, 1);
+  else state.pcFavorites.unshift(key);
+  saveJSON(STORAGE_KEY_FAV, state.pcFavorites);
+}
+function markRecentlyViewed(r){
+  var key = brandKey(r);
+  state.pcRecent = state.pcRecent.filter(function(k){ return k !== key; });
+  state.pcRecent.unshift(key);
+  if (state.pcRecent.length > 8) state.pcRecent = state.pcRecent.slice(0, 8);
+  saveJSON(STORAGE_KEY_RECENT, state.pcRecent);
+  logEvent('view_brand', r.Brand);
+}
+function findRowsByKeys(rows, keys){
+  var map = {};
+  rows.forEach(function(r){ map[brandKey(r)] = r; });
+  return keys.map(function(k){ return map[k]; }).filter(Boolean);
+}
+function formatSyncTime(iso){
+  if (!iso) return '';
+  try{
+    var d = new Date(iso);
+    return d.toLocaleString(state.lang === 'ms' ? 'ms-MY' : 'en-MY', {
+      day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
+    });
+  }catch(e){ return ''; }
+}
+function medCard(opts){
+  var isFav = opts.favKey && state.pcFavorites.indexOf(opts.favKey) > -1;
+  var starHtml = opts.favKey
+    ? '<button class="fav-btn '+(isFav?'active':'')+'" data-favkey="'+escapeHtml(opts.favKey)+'" aria-label="Favorite">'+(isFav?'★':'☆')+'</button>'
+    : '';
+  var toneClass = opts.tone ? ' tone-'+opts.tone : '';
+  var counsel = opts.counsel
+    ? '<div class="counsel-note"><span class="counsel-label">'+t('counselLabel')+'</span>'+escapeHtml(opts.counsel)+'</div>'
+    : '';
+  return ''
+    + '<div class="med-card'+toneClass+'"'+(opts.viewKey?' data-viewkey="'+escapeHtml(opts.viewKey)+'"':'')+'>'
+    +   '<div class="row1">'
+    +     '<div class="row1-main">'
+    +       '<span class="brand">'+opts.brandHtml+'</span>'
+    +       (opts.tagHtml ? '<span class="active-tag">'+opts.tagHtml+'</span>' : '')
+    +     '</div>'
+    +     starHtml
+    +   '</div>'
+    +   (opts.groupHtml ? '<div class="group-tag">'+opts.groupHtml+'</div>' : '')
+    +   '<div class="indikasi">'+opts.indHtml+'</div>'
+    +   '<div class="dos">'+escapeHtml(opts.dos)+'</div>'
+    +   counsel
+    + '</div>';
 }
 
 /* ===================== DATA LOADING ===================== */
@@ -503,6 +701,7 @@ function renderTopbar(){
   document.getElementById('settingsDesc').textContent = t('settingsDesc');
   document.getElementById('closeSettings').textContent = t('close');
   document.getElementById('saveSettings').textContent = t('save');
+  document.getElementById('statsToggleBtn').textContent = t('viewStatsBtn');
 }
 
 /* ===================== RENDER: HOME ===================== */
@@ -531,7 +730,8 @@ function renderHome(){
   +     '</div>'
   +   '</button>'
   + '</div>'
-  + '<div class="footer-note">LAUTAN Book v1.2</div>';
+  + (state.data && state.data.generatedAt ? '<div class="sync-note">'+t('syncNote')(formatSyncTime(state.data.generatedAt))+'</div>' : '')
+  + '<div class="footer-note">LAUTAN Book v1.3</div>';
 }
 
 /* ===================== RENDER: POISON C PORTAL ===================== */
@@ -580,23 +780,49 @@ function renderPoisonC(){
 
   html += '<div class="result-count">'+t('resultsFound')(filtered.length)+'</div>';
 
+  if (!q) {
+    if (state.pcFavorites.length) {
+      var favRows = findRowsByKeys(rows, state.pcFavorites);
+      if (favRows.length) html += renderPcGroup('__fav__', '★ ' + t('favTitle'), favRows);
+    }
+    if (state.pcRecent.length) {
+      var recentRows = findRowsByKeys(rows, state.pcRecent);
+      if (recentRows.length) html += renderPcGroup('__recent__', '🕘 ' + t('recentTitle'), recentRows);
+    }
+  }
+
   if (!filtered.length) {
     html += '<div class="empty-state"><div class="mark"></div><p><b>'+t('noMatch')+'</b></p><p>'+t('noMatchDesc')+'</p></div>';
   } else {
-    html += '<div class="card-list">' + filtered.map(function(r){
-      return ''
-      + '<div class="med-card">'
-      +   '<div class="row1">'
-      +     '<div class="brand">'+highlight(r.Brand, state.pcQuery)+'</div>'
-      +     '<div class="active-tag">'+highlight(r['Active Ingredient'], state.pcQuery)+'</div>'
-      +   '</div>'
-      +   (r.Group ? '<div class="group-tag">'+escapeHtml(r.Group)+'</div>' : '')
-      +   '<div class="indikasi">'+highlight(r.Indication, state.pcQuery)+'</div>'
-      +   '<div class="dos">'+escapeHtml(r.Dose)+'</div>'
-      + '</div>';
-    }).join('') + '</div>';
+    var groups = groupBy(filtered, 'Active Ingredient');
+    html += groups.map(function(g){ return renderPcGroup(g.key, highlight(g.key, state.pcQuery), g.rows); }).join('');
   }
   return html;
+}
+
+function renderPcGroup(groupKey, labelHtml, rowsForGroup){
+  var collapsed = !!state.pcCollapsed[groupKey];
+  return '<div class="group-block">'
+    + '<div class="collapsible-header pc-group-toggle '+(collapsed?'collapsed':'')+'" data-group="'+escapeHtml(groupKey)+'">'
+    +   '<span class="group-name">'+labelHtml+'</span>'
+    +   '<span class="group-count">'+rowsForGroup.length+'</span>'
+    +   '<span class="chevron">⌄</span>'
+    + '</div>'
+    + '<div class="collapsible-body '+(collapsed?'collapsed':'')+'">'
+    +   '<div class="card-list">' + rowsForGroup.map(function(r){
+          return medCard({
+            viewKey: brandKey(r),
+            favKey: brandKey(r),
+            brandHtml: highlight(r.Brand, state.pcQuery),
+            tagHtml: highlight(r['Active Ingredient'], state.pcQuery),
+            groupHtml: r.Group ? escapeHtml(r.Group) : '',
+            indHtml: highlight(r.Indication, state.pcQuery),
+            dos: r.Dose,
+            counsel: getCounsellingNote(r)
+          });
+        }).join('') + '</div>'
+    + '</div>'
+  + '</div>';
 }
 
 /* ===================== RENDER: COMBO PORTAL ===================== */
@@ -647,48 +873,57 @@ function renderCombo(){
   }
 
   if (pc.length) {
-    html += '<div class="combo-section"><h4><span class="badge">'+t('badgeMain')+'</span>'+t('sectionActive')+'</h4>'
+    var mainCollapsed = !!state.comboCollapsed.main;
+    html += '<div class="combo-section">'
+      + '<h4 class="combo-toggle '+(mainCollapsed?'collapsed':'')+'" data-section="main"><span class="badge">'+t('badgeMain')+'</span>'+t('sectionActive')+'<span class="group-count">'+pc.length+'</span><span class="chevron">⌄</span></h4>'
+      + '<div class="collapsible-body '+(mainCollapsed?'collapsed':'')+'">'
       + '<div class="card-list">' + pc.map(function(r){
-          return ''
-          + '<div class="med-card">'
-          +   '<div class="row1">'
-          +     '<div class="brand">'+escapeHtml(r.Brand)+'</div>'
-          +     '<div class="active-tag">'+escapeHtml(r['Active Ingredient'])+'</div>'
-          +   '</div>'
-          +   (r.Group ? '<div class="group-tag">'+escapeHtml(r.Group)+'</div>' : '')
-          +   '<div class="indikasi">'+highlight(r.Indication, state.comboQuery)+'</div>'
-          +   '<div class="dos">'+escapeHtml(r.Dose)+'</div>'
-          + '</div>';
-        }).join('') + '</div></div>';
+          return medCard({
+            viewKey: brandKey(r),
+            favKey: brandKey(r),
+            brandHtml: escapeHtml(r.Brand),
+            tagHtml: escapeHtml(r['Active Ingredient']),
+            groupHtml: r.Group ? escapeHtml(r.Group) : '',
+            indHtml: highlight(r.Indication, state.comboQuery),
+            dos: r.Dose,
+            counsel: getCounsellingNote(r)
+          });
+        }).join('') + '</div></div></div>';
   }
 
   if (sup.length) {
-    html += '<div class="combo-section suplemen"><h4><span class="badge">'+t('badgeUpsell')+'</span>'+t('sectionSuplemen')+'</h4>'
+    var supCollapsed = !!state.comboCollapsed.upsell;
+    html += '<div class="combo-section suplemen">'
+      + '<h4 class="combo-toggle '+(supCollapsed?'collapsed':'')+'" data-section="upsell"><span class="badge">'+t('badgeUpsell')+'</span>'+t('sectionSuplemen')+'<span class="group-count">'+sup.length+'</span><span class="chevron">⌄</span></h4>'
+      + '<div class="collapsible-body '+(supCollapsed?'collapsed':'')+'">'
       + '<div class="combo-hint">'+t('hintSuplemen')+'</div>'
       + '<div class="card-list" style="margin-top:10px;">' + sup.map(function(r){
-          return ''
-          + '<div class="med-card tone-gold">'
-          +   '<div class="row1">'
-          +     '<div class="brand">'+escapeHtml(r.Supplement)+'</div>'
-          +     (r['Active ingredient'] ? '<div class="active-tag">'+escapeHtml(r['Active ingredient'])+'</div>' : '')
-          +   '</div>'
-          +   '<div class="indikasi">'+highlight(r.Indication, state.comboQuery)+'</div>'
-          +   '<div class="dos">'+escapeHtml(r.Dose)+'</div>'
-          + '</div>';
-        }).join('') + '</div></div>';
+          return medCard({
+            tone:'gold',
+            brandHtml: escapeHtml(r.Supplement),
+            tagHtml: r['Active ingredient'] ? escapeHtml(r['Active ingredient']) : '',
+            indHtml: highlight(r.Indication, state.comboQuery),
+            dos: r.Dose,
+            counsel: getCounsellingNote(r)
+          });
+        }).join('') + '</div></div></div>';
   }
 
   if (nas.length) {
-    html += '<div class="combo-section nasal"><h4><span class="badge">'+t('badgeCross')+'</span>'+t('sectionNasal')+'</h4>'
+    var addonCollapsed = !!state.comboCollapsed.addon;
+    html += '<div class="combo-section nasal">'
+      + '<h4 class="combo-toggle '+(addonCollapsed?'collapsed':'')+'" data-section="addon"><span class="badge">'+t('badgeCross')+'</span>'+t('sectionNasal')+'<span class="group-count">'+nas.length+'</span><span class="chevron">⌄</span></h4>'
+      + '<div class="collapsible-body '+(addonCollapsed?'collapsed':'')+'">'
       + '<div class="combo-hint">'+t('hintNasal')+'</div>'
       + '<div class="card-list" style="margin-top:10px;">' + nas.map(function(r){
-          return ''
-          + '<div class="med-card tone-teal">'
-          +   '<div class="row1"><div class="brand">'+escapeHtml(r.Description)+'</div></div>'
-          +   '<div class="indikasi">'+highlight(r.Indication, state.comboQuery)+'</div>'
-          +   '<div class="dos">'+escapeHtml(r.Dose)+'</div>'
-          + '</div>';
-        }).join('') + '</div></div>';
+          return medCard({
+            tone:'teal',
+            brandHtml: escapeHtml(r.Description),
+            indHtml: highlight(r.Indication, state.comboQuery),
+            dos: r.Dose,
+            counsel: getCounsellingNote(r)
+          });
+        }).join('') + '</div></div></div>';
   }
 
   return html;
@@ -716,6 +951,7 @@ function bindEvents(){
     if (input) {
       input.addEventListener('input', function(){
         state.pcQuery = input.value;
+        debouncedLogSearch('search_brand', input.value);
         render();
         var i2 = document.getElementById('pcInput');
         if (i2) { i2.focus(); i2.setSelectionRange(i2.value.length, i2.value.length); }
@@ -726,12 +962,21 @@ function bindEvents(){
     document.querySelectorAll('.filter-chip').forEach(function(el){
       el.addEventListener('click', function(){ state.pcFilter = el.getAttribute('data-filter'); render(); });
     });
+    document.querySelectorAll('.pc-group-toggle').forEach(function(el){
+      el.addEventListener('click', function(){
+        var g = el.getAttribute('data-group');
+        state.pcCollapsed[g] = !state.pcCollapsed[g];
+        render();
+      });
+    });
+    bindCardEvents();
   }
   if (state.route === 'combo') {
     var cInput = document.getElementById('comboInput');
     if (cInput) {
       cInput.addEventListener('input', function(){
         state.comboQuery = cInput.value;
+        debouncedLogSearch('search_symptom', cInput.value);
         render();
         var i2 = document.getElementById('comboInput');
         if (i2) { i2.focus(); i2.setSelectionRange(i2.value.length, i2.value.length); }
@@ -742,7 +987,34 @@ function bindEvents(){
     document.querySelectorAll('.sym-chip').forEach(function(el){
       el.addEventListener('click', function(){ state.comboQuery = el.getAttribute('data-sym'); render(); });
     });
+    document.querySelectorAll('.combo-toggle').forEach(function(el){
+      el.addEventListener('click', function(){
+        var s = el.getAttribute('data-section');
+        state.comboCollapsed[s] = !state.comboCollapsed[s];
+        render();
+      });
+    });
+    bindCardEvents();
   }
+}
+
+function bindCardEvents(){
+  document.querySelectorAll('.fav-btn').forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.stopPropagation();
+      toggleFavorite(el.getAttribute('data-favkey'));
+      logEvent('fav_brand', el.getAttribute('data-favkey').split('|')[0]);
+      render();
+    });
+  });
+  document.querySelectorAll('.med-card[data-viewkey]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var key = el.getAttribute('data-viewkey');
+      var rows = (state.data && state.data.poisonC) || [];
+      var row = rows.filter(function(r){ return brandKey(r) === key; })[0];
+      if (row) markRecentlyViewed(row);
+    });
+  });
 }
 
 document.getElementById('backBtn').addEventListener('click', function(){ goTo('home'); });
@@ -759,6 +1031,8 @@ document.getElementById('langToggle').addEventListener('click', function(e){
 /* SETTINGS MODAL */
 function openSettings(){
   document.getElementById('apiUrlInput').value = getApiUrl();
+  document.getElementById('statsToggleBtn').textContent = t('viewStatsBtn');
+  document.getElementById('statsPanel').style.display = 'none';
   document.getElementById('settingsModal').classList.add('show');
 }
 function closeSettingsModal(){ document.getElementById('settingsModal').classList.remove('show'); }
@@ -774,6 +1048,54 @@ document.getElementById('saveSettings').addEventListener('click', function(){
   closeSettingsModal();
   showToast(t('toastSaved'));
   loadData(true);
+});
+
+/* USAGE ANALYTICS PANEL */
+function renderStatsPanelHtml(){
+  if (state.statsLoading) return '<div class="stats-msg">'+t('statsLoading')+'</div>';
+  if (state.statsError) return '<div class="stats-msg">'+t('statsErr')+'</div>';
+  var s = state.statsData;
+  if (!s || !s.totalEvents) return '<div class="stats-msg">'+t('statsEmpty')+'</div>';
+
+  var html = '';
+  if (s.topBrands && s.topBrands.length) {
+    html += '<h5>'+t('statsTopBrand')+'</h5>' + s.topBrands.map(function(item){
+      return '<div class="stats-row-item"><span class="lbl">'+escapeHtml(item.label)+'</span><span class="cnt">'+item.count+'</span></div>';
+    }).join('');
+  }
+  if (s.topSymptoms && s.topSymptoms.length) {
+    html += '<h5>'+t('statsTopSymptom')+'</h5>' + s.topSymptoms.map(function(item){
+      return '<div class="stats-row-item"><span class="lbl">'+escapeHtml(item.label)+'</span><span class="cnt">'+item.count+'</span></div>';
+    }).join('');
+  }
+  html += '<div class="stats-total">'+t('statsTotal')(s.totalEvents)+'</div>';
+  return html;
+}
+function fetchStats(){
+  var url = getApiUrl();
+  if (!url) { state.statsError = true; document.getElementById('statsPanel').innerHTML = renderStatsPanelHtml(); return; }
+  state.statsLoading = true;
+  state.statsError = false;
+  document.getElementById('statsPanel').innerHTML = renderStatsPanelHtml();
+  fetch(url + (url.indexOf('?')>-1?'&':'?') + 'action=getStats')
+    .then(function(r){ return r.json(); })
+    .then(function(json){
+      state.statsLoading = false;
+      if (json && json.ok) { state.statsData = json.stats; }
+      else { state.statsError = true; }
+      document.getElementById('statsPanel').innerHTML = renderStatsPanelHtml();
+    })
+    .catch(function(){
+      state.statsLoading = false;
+      state.statsError = true;
+      document.getElementById('statsPanel').innerHTML = renderStatsPanelHtml();
+    });
+}
+document.getElementById('statsToggleBtn').addEventListener('click', function(){
+  var panel = document.getElementById('statsPanel');
+  var willShow = panel.style.display === 'none';
+  panel.style.display = willShow ? 'block' : 'none';
+  if (willShow) fetchStats();
 });
 
 /* ONLINE / OFFLINE */
